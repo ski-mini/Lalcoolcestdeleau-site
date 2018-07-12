@@ -1,0 +1,55 @@
+{% extends 'AppBundle::layout.html.twig' %}
+
+{% trans_default_domain 'AppBundle' %}
+
+{% block content %}
+
+    <div class="col-lg-12">
+            <a href="{{ path('NewDeck') }}">Créez votre mode de jeu</a>
+
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Type</th>
+                            <th>Téléchargement</th>
+                            <th>Note</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for deck in deckList %}
+                            <tr>
+                                <td class="vamiddle">
+                                    {{ deck.name }}
+                                </td>
+                                <td class="vamiddle">
+                                     {{ deck.deckType.name }}
+                                </td>
+                                <td class="vamiddle">
+                                    {% if deck.download is empty %}
+                                        0
+                                    {% else %}
+                                        {{ deck.download }}
+                                    {% endif %}
+                                </td>
+                                <td class="vamiddle">
+                                    {% if deck.rate is empty %}
+                                        0
+                                    {% else %}
+                                        {{ deck.rate }}
+                                    {% endif %}
+                                </td>
+                                <td class="vamiddle">
+                                    <a class="btn btn-default btn-block" href="{{ path('SeeDeck', { 'deckId': deck.id }) }}">Voir</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

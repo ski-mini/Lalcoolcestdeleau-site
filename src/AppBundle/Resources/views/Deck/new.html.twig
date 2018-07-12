@@ -1,0 +1,260 @@
+{% extends 'AppBundle::layout.html.twig' %}
+
+{% trans_default_domain 'AppBundle' %}
+
+{% block content %}
+
+    <div class="col-lg-12 newDeck">
+        <div class="col-lg-8" style="border-right:1px dotted gray;padding-right:15px;">
+            <h1>
+                {% if deck is defined %}
+                    Modification d'un deck
+                {% else %}
+                    Création d'un nouveau deck de règles
+                {% endif %} <span class="label label-info pull-right">Aide</span>
+            </h1>
+            <br/> 
+//todo compteur de caractères avec un max
+            <form action="{{ path("CreateRules") }}" method="post">
+                <div class="form-group form-group-lg">
+                    <select class="form-control" name="deckType" required>
+                        <option value="1">Solitaire</option>
+                        <option value="2" {% if deck is defined and (deck.deckType.id == 2) %}selected=selected{% endif %}>En groupe</option>
+                    </select>
+                </div>
+            
+                <div class="editingRuleSection">
+<!--                 //si c'est son deck qui est modif => update all, sinon crée => a verif coté serveur le if user = user
+                    //coté client on claque juste un bouton "modifier" en plus du supprimer avec un effet "impossible à modif" 
+                    // + champs update = 0 et if click modif set update = 1 -->
+                    {% if deck is defined %}
+                        {% for rule in deck.rules %}
+                            {% if rule.ruletype.id == 1 %}
+                                <div class="rule simpleRule clickToEdit" data-ruleid="{{ rule.id }}">
+                                    <div style="width:100%;">
+                                        <label>Règle simple</label>
+                                        <button type="button" class="btn btn-danger myClose" data-ruleid="{{ rule.id }}" disabled=disabled><span aria-hidden="true">&times;</span></button>
+                                    </div>
+                                    <div class="hide" style="margin:0 0 5px 5px;">
+                                        <span class="label label-success cursor insertJ1">Joueur1</span>
+                                        <span class="label label-success cursor insertJ2">Joueur2</span>
+                                        <span class="label label-success cursor insertJ3">Joueur3</span>
+                                        <span class="label label-success cursor insertJ4">Joueur4</span>
+                                    </div>
+                                    <div class="form-control mb20 contentEditable" contentEditable="false">{{ rule.text|beautifulRule(deck.deckType.id)|raw }}</div>
+                                    <textarea name="simpleRules[{{ rule.id }}]" style="display:none;"></textarea>
+                                </div>
+                            {% elseif rule.ruletype.id == 2 %}
+                                <div class="rule multipleRule clickToEdit" data-ruleid="{{ rule.id }}">
+                                    <div style="width:100%;">
+                                        <label>Règle en plusieurs temps</label>
+                                        <button type="button" class="btn btn-danger myClose" data-ruleid="{{ rule.id }}" disabled=disabled><span aria-hidden="true">&times;</span></button>
+                                    </div>
+                                    {% for text in rule.text %}
+                                        <div class="hide" style="margin:0 0 5px 5px;">
+                                            <span class="label label-success cursor insertJ1">Joueur1</span>
+                                            <span class="label label-success cursor insertJ2">Joueur2</span>
+                                            <span class="label label-success cursor insertJ3">Joueur3</span>
+                                            <span class="label label-success cursor insertJ4">Joueur4</span>
+                                        </div>
+                                        <div class="form-control mb20 contentEditable" contentEditable="false">{{ text|beautifulRule(deck.deckType.id)|raw }}</div>
+                                    {% endfor %}
+                                    <textarea name="multipleRules[{{ rule.id }}]" style="display:none;"></textarea>
+                                </div>
+                            {% elseif rule.ruletype.id == 3 %}
+                                <div class="rule severalPartsRule clickToEdit" data-ruleid="{{ rule.id }}">
+                                    <div style="width:100%;">
+                                        <label>Règle en plusieurs parties</label>
+                                        <button type="button" class="btn btn-danger myClose" data-ruleid="{{ rule.id }}" disabled=disabled><span aria-hidden="true">&times;</span></button>
+                                    </div>
+                                    {% for text in rule.text %}
+                                        <div class="hide" style="margin:0 0 5px 5px;">
+                                            <span class="label label-success cursor insertJ1">Joueur1</span>
+                                            <span class="label label-success cursor insertJ2">Joueur2</span>
+                                            <span class="label label-success cursor insertJ3">Joueur3</span>
+                                            <span class="label label-success cursor insertJ4">Joueur4</span>
+                                        </div>
+                                        <div class="form-control mb20 contentEditable" contentEditable="false">{{ text|beautifulRule(deck.deckType.id)|raw }}</div>
+                                    {% endfor %}
+                                    <button type="button" class="btn btn-primary btn-sm mb20 addFollowingRule" disabled=disabled>+</button>
+                                    <textarea name="severalPartsRules[{{ rule.id }}]" style="display:none;"></textarea>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        <input name="updatedRules" style="display:none;" value="" />
+                        <input name="deletedRules" style="display:none;" value="" />
+                        <input name="deckId" style="display:none;" value="{{ deck.id }}" />
+                        <input name="mode" style="display:none;" value="new" />
+                    {% endif %}
+                </div>
+                <br/>
+                <div>
+                    <i class="fa fa-info-circle" aria-hidden="true"></i> Ce deck contient <span id="nbRule">{% if deck is defined %}{{deck.rules|length}} règle(s){% else %}0 règle{% endif %}</span>.
+                </div>
+                <br/>
+
+                <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#addRule">+</button>
+                {% if deck is defined %}
+                    {% if deck.user == app.user %}
+                        <button type="button" class="btn btn-success btn-lg btn-block setModeToUpdate">Continuer et modifier ce deck</button>
+                        <button type="submit" class="btn btn-success btn-lg btn-block setModeToNew">Continuer et créer un nouveau deck</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-success btn-lg btn-block">Continuer</button>
+                    {% endif %}
+                {% else %}
+                    <button type="submit" class="btn btn-success btn-lg btn-block">Continuer</button>
+                {% endif %}
+                <br/>
+            </form>
+        </div>
+
+        <div class="col-lg-4">
+            <p>
+                Plus d'idée ? Ajoute des règles existantes !
+            </p>
+            <div class="form-group has-feedback has-feedback-left">
+              <div class="input-group">
+                <i class="fa fa-search form-control-feedback"></i>
+                <input type="text" style="position:static;" class="form-control" id="search" placeholder="Rechercher" />
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="button">Go!</button>
+                </span>
+              </div>
+            </div>
+            <hr/>
+            <p>
+                Règles les plus utilisées / mieux notées
+            </p>
+            <button type="button" class="btn btn-default btn-lg btn-block">Blablablabla</button>
+            <button type="button" class="btn btn-default btn-lg btn-block">Blablablabla</button>
+            <button type="button" class="btn btn-default btn-lg btn-block">Blablablabla</button>
+            <button type="button" class="btn btn-default btn-lg btn-block">Blablablabla</button>
+            <button type="button" class="btn btn-default btn-lg btn-block">Voir plus</button>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="addRule" tabindex="-1" role="dialog" aria-labelledby="addRuleLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="addRuleLabel">Choissir le type de règle</h4>
+                    </div>
+                    <div class="modal-body newRule">
+                        <button type="button" style="text-align:left;" data-dismiss="modal" class="btn btn-default btn-lg btn-block addSimple">
+                            Règle simple
+                        </button>
+                        <button type="button" data-dismiss="modal" data-toggle="tooltip" data-placement="bottom" title="<p>Ex : <ul><li>Michel est maintenant le roi des pouces</li><li>Michel n'est plus le roi des pouces</li></ul></p>" style="text-align:left;" class="btn btn-default btn-lg btn-block addMultiple">
+                            Règle en plusieurs temps
+                        </button>
+                        <button type="button" data-dismiss="modal" data-toggle="tooltip" data-placement="bottom" title="<p>Ex : <ul><li>Equipe A et Equipe B choisissent un champion sur le thème : Alcool</li><li>Equipe A commence, le champion de l'équipe B s'isole</li><li>Deux culs secs à distribuer pour les gagnants : Celui qui donne le plus de nom d'alcool en 10 seconde !</li></ul></p>" style="text-align:left;" class="btn btn-default btn-lg btn-block addSeveralParts">
+                            Règle en plusieurs parties
+                        </button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rules -->
+        <div class="newSimpleRule hide">
+            <div style="width:100%;">
+                <label>Règle simple</label>
+                <button type="button" class="btn btn-danger myClose"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div style="margin:0 0 5px 5px;">
+                <span class="label label-success cursor insertJ1">Joueur1</span>
+                <span class="label label-success cursor insertJ2">Joueur2</span>
+                <span class="label label-success cursor insertJ3">Joueur3</span>
+                <span class="label label-success cursor insertJ4">Joueur4</span>
+            </div>
+            <div class="form-control mb20 contentEditable" contentEditable="true" placeholder="Ajouter votre règle..."></div>
+            <textarea name="newSimpleRules[]" style="display:none;"></textarea>
+        </div>
+
+        <div class="newMultipleRule hide">
+            <div style="width:100%;">
+                <label>Règle en plusieurs temps</label>
+                <button type="button" class="btn btn-danger myClose"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div style="margin:0 0 5px 5px;">
+                <span class="label label-success cursor insertJ1">Joueur1</span>
+                <span class="label label-success cursor insertJ2">Joueur2</span>
+                <span class="label label-success cursor insertJ3">Joueur3</span>
+                <span class="label label-success cursor insertJ4">Joueur4</span>
+            </div>
+            <div class="form-control mb20 contentEditable" contentEditable="true" placeholder="Premère partie..."></div>
+            <div style="margin:0 0 5px 5px;">
+                <span class="label label-success cursor insertJ1">Joueur1</span>
+                <span class="label label-success cursor insertJ2">Joueur2</span>
+                <span class="label label-success cursor insertJ3">Joueur3</span>
+                <span class="label label-success cursor insertJ4">Joueur4</span>
+            </div>
+            <div class="form-control mb20 contentEditable" contentEditable="true" placeholder="Suite..."></div>
+            <!-- <button type="button" class="btn btn-primary btn-sm mb20 addFollowingRule">+</button> -->
+            <textarea name="newMultipleRules[]" style="display:none;"></textarea>
+        </div>
+
+        <div class="newSeveralPartsRule hide">
+            <div style="width:100%;">
+                <label>Règle en plusieurs parties</label>
+                <button type="button" class="btn btn-danger myClose"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div style="margin:0 0 5px 5px;">
+                <span class="label label-success cursor insertJ1">Joueur1</span>
+                <span class="label label-success cursor insertJ2">Joueur2</span>
+                <span class="label label-success cursor insertJ3">Joueur3</span>
+                <span class="label label-success cursor insertJ4">Joueur4</span>
+            </div>
+            <div class="form-control mb20 contentEditable" contentEditable="true" placeholder="Premère partie..."></div>
+            <div style="margin:0 0 5px 5px;">
+                <span class="label label-success cursor insertJ1">Joueur1</span>
+                <span class="label label-success cursor insertJ2">Joueur2</span>
+                <span class="label label-success cursor insertJ3">Joueur3</span>
+                <span class="label label-success cursor insertJ4">Joueur4</span>
+            </div>
+            <div class="form-control mb20 contentEditable" contentEditable="true" placeholder="Suite..."></div>
+            <button type="button" class="btn btn-primary btn-sm mb20 addFollowingRule">+</button>
+            <textarea name="newSeveralPartsRules[]" style="display:none;"></textarea>
+        </div>
+
+        <div class="followingRule hide">
+            <div style="margin:0 0 5px 5px;">
+                <span class="label label-success cursor insertJ1">Joueur1</span>
+                <span class="label label-success cursor insertJ2">Joueur2</span>
+                <span class="label label-success cursor insertJ3">Joueur3</span>
+                <span class="label label-success cursor insertJ4">Joueur4</span>
+            </div>
+            <div class="form-control mb20 contentEditable" contentEditable="true" placeholder="Suite..."></div>
+        </div>
+
+        <div class="hide imgForInsertion">
+            {% image '@AppBundle/Resources/public/images/joueur1.png' %}
+                <img src="{{ asset_url }}" class="j1Img" style="height:17px;width:54px;" alt="Joueur1" />
+            {% endimage %}
+
+            {% image '@AppBundle/Resources/public/images/joueur2.png' %}
+                <img src="{{ asset_url }}" class="j2Img" style="height:17px;width:54px;" alt="Joueur2" />
+            {% endimage %}
+
+            {% image '@AppBundle/Resources/public/images/joueur3.png' %}
+                <img src="{{ asset_url }}" class="j3Img" style="height:17px;width:54px;" alt="Joueur3" />
+            {% endimage %}
+
+            {% image '@AppBundle/Resources/public/images/joueur4.png' %}
+                <img src="{{ asset_url }}" class="j4Img" style="height:17px;width:54px;" alt="Joueur4" />
+            {% endimage %}
+
+            {% image '@AppBundle/Resources/public/images/equipe1.png' %}
+                <img src="{{ asset_url }}" class="t1Img" style="height:17px;width:54px;" alt="Equipe1" />
+            {% endimage %}
+
+            {% image '@AppBundle/Resources/public/images/equipe2.png' %}
+                <img src="{{ asset_url }}" class="t2Img" style="height:17px;width:54px;" alt="Equipe2" />
+            {% endimage %}
+        </div>
+    </div>
+
+{% endblock %}

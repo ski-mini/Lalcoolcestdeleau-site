@@ -1,0 +1,48 @@
+{% extends 'AppBundle::layout.html.twig' %}
+
+{% trans_default_domain 'AppBundle' %}
+
+{% block content %}
+
+<div class="row">
+    <section class="col-sm-8">
+        <article class="col-sm-12">
+
+            <a href="{{ path('NewDeck') }}">Créez votre mode de jeu</a>
+            <br>
+            <a href="{{ path('NewDeck') }}">Proposez une règle</a>
+            <br>
+            {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                <a href="{{ path('deckListUser', { 'username': app.user.username|capitalize }) }}">Vos modes de jeu</a>
+            {% endif %}
+
+        </article>
+         
+        <article class="col-sm-6">
+            <h2>Decks les mieux notés</h2>
+            {{ render(controller("AppBundle:Deck:toprate")) }}
+        </article>
+        <article class="col-sm-6">
+            <h2>Règles les mieux notées</h2>
+            {{ render(controller("AppBundle:Rule:toprate")) }}
+        </article>
+        <article class="col-sm-6">
+            <h2>Derniers decks</h2>
+            {{ render(controller("AppBundle:Deck:last")) }}
+        </article>
+        <article class="col-sm-6">
+            <h2>Dernières règles</h2>
+            {{ render(controller("AppBundle:Rule:last")) }}
+        </article>
+        
+        
+    </section>
+    <aside class="col-sm-4">
+        {% image '@AppBundle/Resources/public/images/smartphone.png' %}
+            <img src="{{ asset_url }}" alt="smartphone" />
+        {% endimage %}
+        <a href="">Android</a>
+    </aside>
+</div>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+.cursor{
+    cursor:pointer;
+}
+
+.myClose{
+    float:right;
+    padding:0 5px;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.clickToEdit{
+  cursor:pointer;
+  filter:grayscale(80%);
+}
+
+.mb20{
+    margin-bottom: 20px;
+}
+
+[contenteditable=true]:empty:before {
+  content: attr(placeholder);
+  color:#999;
+  display: block; /* For Firefox */
+}
+
+.contentEditable{
+    height: 60px;
+    overflow: auto;
+    word-wrap: break-word;
+}
+
+.vamiddle {
+  vertical-align: middle;
+}

@@ -1,0 +1,36 @@
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block login %}
+
+            <li class="dropdown">
+
+                    <a class="dropdown-toggle" href="#" data-toggle="dropdown" id="navLogin">{{ 'security.login.submit'|trans }}</a>
+                    <div class="dropdown-menu" style="padding:15px;width:200px;">
+                      <form role="form" action="{{ path("fos_user_security_check") }}" method="post">
+                        {% if csrf_token %}
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+                        {% endif %}
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="{{ 'security.login.username'|trans }}" name="_username" value="{{ last_username }}" required="required">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" placeholder="{{ 'security.login.password'|trans }}" name="_password" required="required">
+                        </div>
+                        <div class="checkbox checkbox-inline">
+                            <input type="checkbox" id="remember_me" name="_remember_me" value="on" />
+                            <label style="font-size:14px;font-weight:normal;" for="remember_me">
+                                {{ 'security.login.remember_me'|trans }}
+                            </label>
+                        </div>
+                        <br />
+                        <br />
+                        <button type="submit" class="btn btn-success" id="_submit" name="_submit">{{ 'security.login.submit'|trans }}</button>
+                      </form>
+                    </div>
+
+            </li>
+          <li><a href="{{ path('fos_user_registration_register') }}">Inscription</a></li>
+
+
+
+{% endblock login %}
